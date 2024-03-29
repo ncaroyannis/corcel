@@ -12,24 +12,37 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0",
-        "illuminate/database": "5.5.*",
-        "illuminate/filesystem": "5.5.*",
-        "illuminate/support": "5.5.*",
-        "fzaninotto/faker": "^1.6",
-        "hautelook/phpass": "0.3.4",
-        "thunderer/shortcode": "^0.6.2"
+        "php": "^8.2",
+        "illuminate/database": "^11.0",
+        "illuminate/filesystem": "^11.0",
+        "illuminate/support": "^11.0",
+        "fakerphp/faker": "^1.19",
+        "bordoni/phpass": "0.3.*",
+        "thunderer/shortcode": "^0.7.3"
     },
     "require-dev": {
-        "orchestra/testbench": "3.5.*",
-        "orchestra/database": "3.5.*",
-        "satooshi/php-coveralls": "dev-master",
-        "phpunit/phpunit": "~6.0"
+        "laravel/legacy-factories": "^1.0",
+        "orchestra/testbench": "^9.0",
+        "symfony/thanks": "^1.0",
+        "mockery/mockery": "^1.4.4",
+        "dms/phpunit-arraysubset-asserts": "^0.5"
     },
     "autoload": {
         "psr-4": {
             "Corcel\\": "src/",
             "Corcel\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Corcel\\Laravel\\CorcelServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/thanks": true
         }
     }
 }

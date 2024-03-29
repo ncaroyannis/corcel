@@ -11,6 +11,7 @@ use Corcel\Model\Term;
 use Corcel\Model\User;
 use Corcel\Shortcode;
 use Illuminate\Support\Arr;
+use Illuminate\Pagination\Paginator;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
 
 /**
@@ -20,31 +21,22 @@ use Thunder\Shortcode\Shortcode\ShortcodeInterface;
  */
 class PostTest extends \Corcel\Tests\TestCase
 {
-    /**
-     * @test
-     */
-    public function it_has_the_correct_class_name()
+    public function test_it_has_the_correct_class_name()
     {
         $post = factory(Post::class)->create();
 
         $this->assertInstanceOf(Post::class, $post);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_an_integer_id()
+    public function test_it_has_an_integer_id()
     {
         $post = factory(Post::class)->create();
 
-        $this->assertTrue(is_int($post->ID));
+        $this->assertIsInt($post->ID);
         $this->assertGreaterThan(0, $post->ID);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_status_scope()
+    public function test_it_has_status_scope()
     {
         factory(Post::class)->create(['post_status' => 'foo']);
 
@@ -54,10 +46,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertCount(1, $posts);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_has_meta_scope()
+    public function test_it_has_has_meta_scope()
     {
         $post = factory(Post::class)->create();
         $post->saveMeta('foo', 'bar');
@@ -72,10 +61,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($post->ID, $newPost->ID);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_published_scope()
+    public function test_it_has_published_scope()
     {
         factory(Post::class)->create(['post_status' => 'publish']);
 
@@ -85,10 +71,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertGreaterThan(0, $posts->count());
     }
 
-    /**
-     * @test
-     */
-    public function it_has_type_scope()
+    public function test_it_has_type_scope()
     {
         factory(Post::class)->create(['post_type' => 'foo']);
 
@@ -98,10 +81,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertCount(1, $posts);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_type_in_scope()
+    public function test_it_has_type_in_scope()
     {
         factory(Post::class)->create(['post_type' => 'blue']);
         factory(Post::class)->create(['post_type' => 'red']);
@@ -113,10 +93,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertCount(2, $posts);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_slug_scope()
+    public function test_it_has_slug_scope()
     {
         factory(Post::class)->create(['post_name' => 'my-fake-post-slug']);
 
@@ -126,10 +103,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertCount(1, $posts);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_taxonomy_scope()
+    public function test_it_has_taxonomy_scope()
     {
         $this->createPostWithTaxonomiesAndTerms();
 
@@ -142,10 +116,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertGreaterThan(0, $posts->count());
     }
 
-    /**
-     * @test
-     */
-    public function it_has_children_relation()
+    public function test_it_has_children_relation()
     {
         $post = factory(Post::class)->create();
         factory(Post::class)->create(['post_parent' => $post->ID]);
@@ -159,10 +130,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($post->ID, $children->first()->post_parent);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_be_ordered()
+    public function test_it_can_be_ordered()
     {
         $older = Carbon::now()->subYears(10);
 
@@ -179,20 +147,14 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($lastPost->post_title, $newest->post_title);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_different_post_type()
+    public function test_it_can_have_different_post_type()
     {
         $page = factory(Post::class)->create(['post_type' => 'page']);
 
         $this->assertEquals($page->post_type, 'page');
     }
 
-    /**
-     * @test
-     */
-    public function it_has_aliases()
+    public function test_it_has_aliases()
     {
         $post = factory(Post::class)->create();
 
@@ -210,10 +172,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($post->post_status, $post->status);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_isset_method_working()
+    public function test_it_has_isset_method_working()
     {
         $post = factory(Post::class)->create();
         $post->createMeta('foo', 'bar');
@@ -221,10 +180,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertTrue(isset($post->meta->foo));
     }
 
-    /**
-     * @test
-     */
-    public function it_can_add_alias_in_runtime()
+    public function test_it_can_add_alias_in_runtime()
     {
         $post = factory(Post::class)->create();
         $post->saveMeta('foo', 'bar');
@@ -238,10 +194,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($post->fee, $post->meta->foo);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_accept_unicode_chars()
+    public function test_it_can_accept_unicode_chars()
     {
         $post = factory(Post::class)->create([
             'post_content' => 'test utf8 é à',
@@ -252,10 +205,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('test chinese characters お問い合わせ', $post->post_excerpt);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_custom_fields()
+    public function test_it_can_have_custom_fields()
     {
         $post = factory(Post::class)->create();
 
@@ -269,10 +219,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertInstanceOf(MetaCollection::class, $post->meta);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_add_custom_fields()
+    public function test_it_can_add_custom_fields()
     {
         $post = factory(Post::class)->create();
 
@@ -283,10 +230,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('bar', $meta->meta_value);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_add_custom_fields_using_save_field_method()
+    public function test_it_can_add_custom_fields_using_save_field_method()
     {
         $post = factory(Post::class)->create();
 
@@ -297,10 +241,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('bar', $meta->meta_value);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_save_multiple_meta_at_the_same_time()
+    public function test_it_can_save_multiple_meta_at_the_same_time()
     {
         $post = factory(Post::class)->create();
 
@@ -314,10 +255,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('baz', $post->meta->fee);
     }
 
-    /**
-     * @test
-     */
-    public function they_can_be_ordered_ascending()
+    public function test_they_can_be_ordered_ascending()
     {
         factory(Post::class, 2)->create();
 
@@ -329,10 +267,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertTrue($last->post_date->greaterThanOrEqualTo($first->post_date));
     }
 
-    /**
-     * @test
-     */
-    public function they_can_be_ordered_descending()
+    public function test_they_can_be_ordered_descending()
     {
         factory(Post::class, 2)->create();
 
@@ -344,11 +279,9 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertTrue($last->post_date->greaterThanOrEqualTo($first->post_date));
     }
 
-    /**
-     * @test
-     */
-    public function it_can_be_paginated()
+    public function test_it_can_be_paginated()
     {
+        Paginator::useBootstrap();
         $post = factory(Post::class)->create();
         factory(Post::class)->create();
         factory(Post::class)->create();
@@ -362,13 +295,10 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals(3, $paginator->total());
         $this->assertInstanceOf(Post::class, $firstPost);
         $this->assertEquals($post->post_title, $firstPost->post_title);
-        $this->assertStringStartsWith('<ul class="pagination">', $paginator->toHtml());
+        $this->assertMatchesRegularExpression('/\<nav\>\s*\<ul class="pagination/', $paginator->toHtml());
     }
     
-    /**
-     * @test
-     */
-    public function it_can_have_taxonomy()
+    public function test_it_can_have_taxonomy()
     {
         $post = $this->createPostWithTaxonomiesAndTerms();
 
@@ -376,10 +306,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('foo', $post->taxonomies->first()->taxonomy);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_taxonomy_and_terms()
+    public function test_it_can_have_taxonomy_and_terms()
     {
         $createdPost = $this->createPostWithTaxonomiesAndTerms();
 
@@ -396,10 +323,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($createdPost->ID, $post->ID);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_term()
+    public function test_it_can_have_term()
     {
         $post = $this->createPostWithTaxonomiesAndTerms();
 
@@ -412,10 +336,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('Bar', $post->keywords_str);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_author_relation()
+    public function test_it_can_have_author_relation()
     {
         $post = $this->createPostWithAuthor();
 
@@ -423,10 +344,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('admin@example.com', $post->author->user_email);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_the_correct_instance_name_if_it_is_a_custom_post_type()
+    public function test_it_has_the_correct_instance_name_if_it_is_a_custom_post_type()
     {
         factory(Post::class)->create(['post_type' => 'page']);
         Post::registerPostType('page', Page::class);
@@ -436,10 +354,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertInstanceOf(Page::class, $page);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_its_instance_name_back_to_post_after_clearing_post_types()
+    public function test_it_has_its_instance_name_back_to_post_after_clearing_post_types()
     {
         factory(Post::class)->create([
             'post_type' => 'page',
@@ -453,10 +368,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertInstanceOf(Post::class, $page);
     }
 
-    /**
-     * @test
-     */
-    public function its_relation_can_have_different_database_connection()
+    public function test_its_relation_can_have_different_database_connection()
     {
         $post = factory(Post::class)->make();
         $post->setConnection('foo');
@@ -466,20 +378,14 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('foo', $post->author->getConnectionName());
     }
 
-    /**
-     * @test
-     */
-    public function its_type_is_fillable()
+    public function test_its_type_is_fillable()
     {
         $post = factory(Post::class)->create(['post_type' => 'video']);
 
         $this->assertEquals('video', $post->post_type);
     }
 
-    /**
-     * @test
-     */
-    public function its_parent_does_not_return_null_when_it_is_zero()
+    public function test_its_parent_does_not_return_null_when_it_is_zero()
     {
         $post = factory(Post::class)->create(['post_parent' => 0]);
 
@@ -487,10 +393,38 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals(0, $post->post_parent);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_shortcode()
+    public function test_parent_relation()
+    {
+        $parent = factory(Post::class)->create();
+        $post = factory(Post::class)->create(['post_parent' => $parent->ID]);
+
+        $this->assertEquals($parent->fresh(), $post->parent);
+    }
+
+    public function test_attachment_relation()
+    {
+        $parent = factory(Post::class)->create();
+        $attachment = factory(Post::class)->create([
+            'post_parent' => $parent->ID,
+            'post_type' => 'attachment',
+        ]);
+
+        $this->assertEquals($attachment->fresh(), $parent->attachment->first());
+    }
+
+    public function test_revision_relation()
+    {
+        $parent = factory(Post::class)->create();
+        $revision = factory(Post::class)->create([
+            'post_parent' => $parent->ID,
+            'post_type' => 'revision',
+        ]);
+
+        $revisions = $parent->revision;
+        $this->assertEquals($revision->fresh(), $revisions->first());
+    }
+
+    public function test_it_can_have_shortcode()
     {
         $this->registerFooShortcode();
 
@@ -501,10 +435,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($post->content, 'test foo.bar.baz');
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_shortcode_from_config_file()
+    public function test_it_can_have_shortcode_from_config_file()
     {
         $post = factory(Post::class)->create([
             'post_content' => 'foo [fake one="two"]',
@@ -513,10 +444,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals('foo html-for-shortcode-fake-two', $post->content);
     }
 
-    /**
-     * @test
-     */
-    public function its_content_can_have_multiple_shortcodes()
+    public function test_its_content_can_have_multiple_shortcodes()
     {
         $this->registerFooShortcode();
 
@@ -527,10 +455,7 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($post->content, '1~foo.bar.baz 2~foo.baz.bar');
     }
 
-    /**
-     * @test
-     */
-    public function its_shortcode_can_be_removed()
+    public function test_its_shortcode_can_be_removed()
     {
         $this->registerFooShortcode();
         Post::removeShortcode('foo');
@@ -542,30 +467,21 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertEquals($post->content, 'test [foo a="bar" b="baz"]');
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_post_format()
+    public function test_it_can_have_post_format()
     {
         $post = $this->createPostWithPostFormatTaxonomy();
 
         $this->assertEquals('foo', $post->getFormat());
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_false_post_format()
+    public function test_it_can_have_false_post_format()
     {
         $post = factory(Post::class)->create();
 
         $this->assertFalse($post->getFormat());
     }
 
-    /**
-     * @test
-     */
-    public function it_has_correct_post_type_with_callback_in_where()
+    public function test_it_has_correct_post_type_with_callback_in_where()
     {
         $query = Page::where(function ($q) {
             $q->where('foo', 'bar');
@@ -578,18 +494,71 @@ class PostTest extends \Corcel\Tests\TestCase
         $this->assertSame($expectedBindings, $query->getBindings());
     }
 
-    /**
-     *
-     * @return Post
-     */
-    private function createPostWithTaxonomiesAndTerms()
+    public function test_its_search_has_correct_empty_word_query()
+    {
+        $emptyWord = Post::search();
+
+        $expectedEmptyWordQuery = 'select * from "wp_posts"';
+        $expectedEmptyWordBindings = [];
+
+        $this->assertEquals($expectedEmptyWordQuery, $emptyWord->toSql());
+        $this->assertSame($expectedEmptyWordBindings, $emptyWord->getBindings());
+    }
+
+    public function test_its_search_has_correct_single_word_query()
+    {
+        $singleWord = Post::search('foo');
+
+        $expectedSingleWordQuery = 'select * from "wp_posts" where ("post_title" like ? or "post_excerpt" like ? or "post_content" like ?)';
+        $expectedSingleWordBindings = ['%foo%', '%foo%', '%foo%'];
+
+        $this->assertEquals($expectedSingleWordQuery, $singleWord->toSql());
+        $this->assertSame($expectedSingleWordBindings, $singleWord->getBindings());
+    }
+
+    public function test_its_search_has_correct_multiple_word_query()
+    {
+        $multipleWord = Post::search('foo bar');
+
+        $expectedMultipleWordQuery = 'select * from "wp_posts" where ("post_title" like ? or "post_excerpt" like ? or "post_content" like ? or "post_title" like ? or "post_excerpt" like ? or "post_content" like ?)';
+        $expectedMultipleWordBindings = ['%foo%', '%foo%', '%foo%', '%bar%', '%bar%', '%bar%'];
+
+        $this->assertEquals($expectedMultipleWordQuery, $multipleWord->toSql());
+        $this->assertSame($expectedMultipleWordBindings, $multipleWord->getBindings());
+    }
+
+    public function test_its_search_has_correct_multiple_word_in_array_query()
+    {
+        $multipleWordArray = Post::search(['foo', 'bar']);
+
+        $expectedMultipleWordQuery = 'select * from "wp_posts" where ("post_title" like ? or "post_excerpt" like ? or "post_content" like ? or "post_title" like ? or "post_excerpt" like ? or "post_content" like ?)';
+        $expectedMultipleWordBindings = ['%foo%', '%foo%', '%foo%', '%bar%', '%bar%', '%bar%'];
+
+        $this->assertEquals($expectedMultipleWordQuery, $multipleWordArray->toSql());
+        $this->assertSame($expectedMultipleWordBindings, $multipleWordArray->getBindings());
+    }
+
+    public function test_its_search_for_different_post_types_is_correct()
+    {
+        $singleWord = Page::search('foo');
+        $multipleWord = Page::search('foo bar');
+
+        $expectedSingleWordQuery = 'select * from "wp_posts" where "post_type" = ? and ("post_title" like ? or "post_excerpt" like ? or "post_content" like ?)';
+        $expectedMultipleWordQuery = 'select * from "wp_posts" where "post_type" = ? and ("post_title" like ? or "post_excerpt" like ? or "post_content" like ? or "post_title" like ? or "post_excerpt" like ? or "post_content" like ?)';
+
+        $this->assertEquals($expectedSingleWordQuery, $singleWord->toSql());
+        $this->assertEquals($expectedMultipleWordQuery, $multipleWord->toSql());
+    }
+
+    private function createPostWithTaxonomiesAndTerms(): Post
     {
         $post = factory(Post::class)->create();
 
         $post->taxonomies()->attach(
             factory(Taxonomy::class)->create([
                 'taxonomy' => 'foo',
-            ])->term_taxonomy_id, [
+            ])->term_taxonomy_id,
+            [
                 'term_order' => 0,
             ]
         );
@@ -597,10 +566,7 @@ class PostTest extends \Corcel\Tests\TestCase
         return $post;
     }
 
-    /**
-     * @return Post
-     */
-    private function createPostWithAuthor()
+    private function createPostWithAuthor(): Post
     {
         $post = factory(Post::class)->create();
 
@@ -611,10 +577,7 @@ class PostTest extends \Corcel\Tests\TestCase
         return $post;
     }
 
-    /**
-     * @return void
-     */
-    private function registerFooShortcode()
+    private function registerFooShortcode(): void
     {
         Post::addShortcode('foo', function (ShortcodeInterface $shortcode) {
             return sprintf(
@@ -626,10 +589,7 @@ class PostTest extends \Corcel\Tests\TestCase
         });
     }
 
-    /**
-     * @return Post
-     */
-    private function createPostWithPostFormatTaxonomy()
+    private function createPostWithPostFormatTaxonomy(): Post
     {
         $post = factory(Post::class)->create();
 
@@ -642,7 +602,8 @@ class PostTest extends \Corcel\Tests\TestCase
                         'slug' => $name,
                     ])->term_id;
                 },
-            ])->term_taxonomy_id, [
+            ])->term_taxonomy_id,
+            [
                 'term_order' => 0,
             ]
         );
@@ -653,11 +614,7 @@ class PostTest extends \Corcel\Tests\TestCase
 
 class FakeShortcode implements Shortcode
 {
-    /**
-     * @param ShortcodeInterface $shortcode
-     * @return string
-     */
-    public function render(ShortcodeInterface $shortcode)
+    public function render(ShortcodeInterface $shortcode): string
     {
         return sprintf(
             'html-for-shortcode-%s-%s',

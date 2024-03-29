@@ -2,10 +2,11 @@
 
 namespace Corcel\Model;
 
+use Corcel\Concerns\AdvancedCustomFields;
+use Corcel\Concerns\Aliases;
+use Corcel\Concerns\MetaFields;
+use Corcel\Concerns\OrderScopes;
 use Corcel\Model;
-use Corcel\Traits\AliasesTrait;
-use Corcel\Traits\HasMetaFields;
-use Corcel\Traits\OrderedTrait;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 
@@ -22,9 +23,10 @@ class User extends Model implements Authenticatable, CanResetPassword
     const CREATED_AT = 'user_registered';
     const UPDATED_AT = null;
 
-    use AliasesTrait;
-    use HasMetaFields;
-    use OrderedTrait;
+    use AdvancedCustomFields;
+    use Aliases;
+    use MetaFields;
+    use OrderScopes;
 
     /**
      * @var string
@@ -62,6 +64,7 @@ class User extends Model implements Authenticatable, CanResetPassword
         'nickname' => ['meta' => 'nickname'],
         'first_name' => ['meta' => 'first_name'],
         'last_name' => ['meta' => 'last_name'],
+        'description' => ['meta' => 'description'],
         'created_at' => 'user_registered',
     ];
 
@@ -132,7 +135,19 @@ class User extends Model implements Authenticatable, CanResetPassword
      */
     public function getAuthPassword()
     {
-        return $this->user_pass;
+        $authPasswordName = $this->getAuthPasswordName();
+
+        return $this->{$authPasswordName};
+    }
+
+    /**
+     * Get the name of the password attribute for the user.
+     *
+     * @return string
+     */
+    public function getAuthPasswordName()
+    {
+        return 'user_pass';
     }
 
     /**
@@ -156,7 +171,7 @@ class User extends Model implements Authenticatable, CanResetPassword
     {
         $tokenName = $this->getRememberTokenName();
 
-        $this->meta->{$tokenName} = $value;
+        $this->saveMeta($tokenName, $value);
     }
 
     /**

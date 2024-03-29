@@ -102,7 +102,7 @@ class AuthUserProvider implements UserProvider
      * @param array $credentials
      * @return bool
      */
-    public function validateCredentials(Authenticatable $user, array $credentials)
+    public function validateCredentials(Authenticatable $user, array $credentials): bool
     {
         if (!isset($credentials['password'])) {
             return false;
@@ -122,5 +122,10 @@ class AuthUserProvider implements UserProvider
         $model = Arr::get($this->config, 'model');
 
         return $model ? new $model : new User;
+    }
+
+    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, bool $force = false)
+    {
+        //
     }
 }

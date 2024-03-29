@@ -3,6 +3,7 @@
 namespace Corcel\Tests\Unit\Model;
 
 use Corcel\Model\Option;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 
 /**
  * Class OptionTest
@@ -11,10 +12,9 @@ use Corcel\Model\Option;
  */
 class OptionTest extends \Corcel\Tests\TestCase
 {
-    /**
-     * @test
-     */
-    public function it_can_return_all_configs_as_array()
+    use ArraySubsetAsserts;
+
+    public function test_it_can_return_all_configs_as_array()
     {
         factory(Option::class)->create([
             'option_name' => 'foo',
@@ -24,15 +24,12 @@ class OptionTest extends \Corcel\Tests\TestCase
         $options = Option::asArray();
         $expected = ['foo' => 'bar'];
 
-        $this->assertArraySubset($expected, $options);
+        self::assertArraySubset($expected, $options);
         $this->assertArrayHasKey('foo', $options);
         $this->assertEquals('bar', $options['foo']);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_return_just_the_config_passing_the_keys()
+    public function test_it_can_return_just_the_config_passing_the_keys()
     {
         Option::add('one', 'two');
         Option::add('three', 'four');
@@ -47,23 +44,17 @@ class OptionTest extends \Corcel\Tests\TestCase
         $this->assertEquals('four', $options['three']);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_a_countable_as_array_method()
+    public function test_it_has_a_countable_as_array_method()
     {
         factory(Option::class, 2)->create();
 
         $options = Option::asArray();
 
-        $this->assertTrue(is_array($options));
-        $this->assertTrue(count($options) > 0);
+        $this->assertIsArray($options);
+        $this->assertGreaterThan(0, count($options));
     }
 
-    /**
-     * @test
-     */
-    public function it_can_have_serialized_data()
+    public function test_it_can_have_serialized_data()
     {
         factory(Option::class)->create([
             'option_name' => 'foo',
@@ -73,25 +64,19 @@ class OptionTest extends \Corcel\Tests\TestCase
         $options = Option::asArray();
 
         $this->assertArrayHasKey('foo', $options);
-        $this->assertInternalType('array', $options['foo']);
+        $this->assertIsArray($options['foo']);
         $this->assertContains($array, $options);
-        $this->assertArraySubset($array, $options['foo']);
+        self::assertArraySubset($array, $options['foo']);
     }
 
-    /**
-     * @test
-     */
-    public function it_returns_null_if_not_found()
+    public function test_it_returns_null_if_not_found()
     {
         $value = Option::get('b03e3fd');
 
         $this->assertNull($value);
     }
 
-    /**
-     * @test
-     */
-    public function it_has_simple_value_attribute()
+    public function test_it_has_simple_value_attribute()
     {
         $option = factory(Option::class)->create([
             'option_name' => 'foo',
@@ -101,10 +86,7 @@ class OptionTest extends \Corcel\Tests\TestCase
         $this->assertEquals('bar', $option->value);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_unserialize_data_if_necessary()
+    public function test_it_can_unserialize_data_if_necessary()
     {
         $option = factory(Option::class)->create([
             'option_name' => 'foo',
@@ -114,27 +96,21 @@ class OptionTest extends \Corcel\Tests\TestCase
         $this->assertEquals($array, $option->value);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_be_converted_to_simple_array()
+    public function test_it_can_be_converted_to_simple_array()
     {
         $option = factory(Option::class)->create([
             'option_name' => 'foo',
             'option_value' => 'bar',
         ]);
 
-        $this->assertArraySubset(['foo' => 'bar'], $option->toArray());
+        self::assertArraySubset(['foo' => 'bar'], $option->toArray());
     }
 
-    /**
-     * @test
-     */
-    public function it_can_add_new_option_using_add_static_method()
+    public function test_it_can_add_new_option_using_add_static_method()
     {
         $option = Option::add('foo', 'bar');
 
         $this->assertEquals('bar', $option->value);
-        $this->assertArraySubset(['foo' => 'bar'], $option->toArray());
+        self::assertArraySubset(['foo' => 'bar'], $option->toArray());
     }
 }

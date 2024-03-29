@@ -3,6 +3,7 @@
 namespace Corcel\Model\Meta;
 
 use Corcel\Model\Term;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class TermMeta
@@ -10,22 +11,18 @@ use Corcel\Model\Term;
  * @package Corcel\Model\Meta
  * @author Junior Grossi <juniorgro@gmail.com>
  */
-class TermMeta extends PostMeta
+class TermMeta extends Meta
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $table = 'termmeta';
 
-    /**
-     * @var array
-     */
+    /** @var string */
+    protected $primaryKey = 'meta_id';
+
+    /** @var array */
     protected $fillable = ['meta_key', 'meta_value', 'term_id'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function term()
+    public function term(): BelongsTo
     {
         return $this->belongsTo(Term::class);
     }
