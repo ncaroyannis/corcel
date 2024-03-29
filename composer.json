@@ -1,8 +1,7 @@
 {
-    "name": "jgrossi/corcel",
-    "replace": { "juniorgrossi/corcel": "self.version" },
+    "name": "ncaroyannis/corcel",
     "description": "Use WordPress backend with Laravel or any PHP framework",
-    "homepage": "http://github.com/corcel/corcel",
+    "homepage": "http://github.com/ncaroyannis/corcel",
     "license": "MIT",
     "authors": [
         {
